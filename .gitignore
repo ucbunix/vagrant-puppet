@@ -1,2 +1,4 @@
-bootstrap/modules*
+bootstrap/module*
 bootstrap/opt-modules*
+bootstrap/dev*
+.vagrant
