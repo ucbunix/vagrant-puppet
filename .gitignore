@@ -1,4 +1,7 @@
 bootstrap/module*
 bootstrap/opt-modules*
 bootstrap/dev*
+bootstrap/manifests/nodes/nrpe.pp
+bootstrap/manifests/nodes/*
+!bootstrap/manifests/nodes/puppet-server.pp
 .vagrant

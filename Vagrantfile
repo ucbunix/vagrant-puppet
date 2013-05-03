@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
     master.vm.provision :puppet do |puppet|
       puppet.manifests_path = 'bootstrap/manifests/nodes/'
       puppet.manifest_file = 'puppet-master.pp'
-      puppet.module_path = [ 'bootstrap/dev', 'bootstrap/modules', 'bootstrap/opt-modules' ]
+      puppet.module_path = [ 'bootstrap/development', 'bootstrap/modules' ]
     end
   end
 
@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
     git.vm.provision :puppet do |puppet|
       puppet.manifests_path = 'bootstrap/manifests/nodes/'
       puppet.manifest_file = 'git-server.pp'
-      puppet.module_path = [ 'bootstrap/dev', 'bootstrap/modules', 'bootstrap/opt-modules' ]
+      puppet.module_path = [ 'bootstrap/development', 'bootstrap/modules', 'bootstrap/opt-modules' ]
     end # git.vm.provision
   end # :git
 

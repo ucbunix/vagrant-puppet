@@ -1,6 +1,6 @@
 node 'pm.lan' {
   include git
-  include site::repo::epel
+  include eu::repo::epel
 
   if $::virtual =~ /virtualbox/ {
     # We're running in vagrant, which means we do some weirdness
@@ -45,7 +45,7 @@ node 'pm.lan' {
     sendmail      => '/usr/sbin/sendmail',
     dns_alt_names => [ 'pm.lan', 'pm', 'puppet.lan', 'puppet' ],
     reportfrom    => 'puppet@pm.lan',
-    require       => Class['site::repo::epel'],
+    require       => Class['eu::repo::epel'],
   }
 
   iptables::rule { 'block-smtp-outbound':
