@@ -1,7 +1,10 @@
-bootstrap/module*
-bootstrap/opt-modules*
-bootstrap/dev*
-bootstrap/manifests/nodes/nrpe.pp
-bootstrap/manifests/nodes/*
-!bootstrap/manifests/nodes/puppet-server.pp
+# this is our custom configurations
+config.d/*
+
+# this is where our puppet node manifest live
+puppet/nodes/*
+
+# this is where our puppet moduels live
+puppet/modules/*
+
 .vagrant

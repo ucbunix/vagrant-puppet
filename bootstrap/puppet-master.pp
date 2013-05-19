@@ -41,29 +41,10 @@ node 'pm.lan' {
     master        => true,
     modulepath    => join($modulepath,':'),
     manifest      => '/etc/puppet/manifests/site.pp',
-    reports       => [ 'tagmail', 'rrdgraph', 'store' ],
-    sendmail      => '/usr/sbin/sendmail',
     dns_alt_names => [ 'pm.lan', 'pm', 'puppet.lan', 'puppet' ],
-    reportfrom    => 'puppet@pm.lan',
     require       => Class['eu::repo::epel'],
   }
 
-  iptables::rule { 'block-smtp-outbound':
-    comment          => 'block smtp outbound',
-    chain            => 'OUTPUT',
-    protocol         => 'tcp',
-    destination_port => '25',
-    action           => 'REJECT',
-  }
-  iptables::rule { 'allow-ssh-ender':
-    comment            => 'allow ssh from ender.berkeley.edu',
-    chain              => 'INPUT',
-    protocol           => 'tcp',
-    priority           => '400',
-    source             => [ '169.229.240.190/25', '169.229.216.0/24' ],
-    state              => 'NEW',
-    destination_port   => [ '22', '443','80'],
-  }
   iptables::rule { 'allow-rel-est-traffic':
     comment            => 'allow related/established traffic',
     chain              => 'INPUT',
