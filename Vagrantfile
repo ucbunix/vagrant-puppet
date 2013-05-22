@@ -21,11 +21,10 @@ Vagrant.configure("2") do |config|
   # Puppet Master
   #
   config.vm.define :master do |master|
-    master.vm.synced_folder "bootstrap/", "/bs"
     master.vm.network :private_network, ip: "10.0.0.10"
     master.vm.provision :shell, :inline => "hostname pm.lan"
     master.vm.provision :puppet do |puppet|
-      puppet.manifests_path = 'bootstrap/'
+      puppet.manifests_path = 'puppet/manifests'
       puppet.manifest_file = 'puppet-master.pp'
       puppet.module_path = [ 'dev',
                               'puppet/modules', 

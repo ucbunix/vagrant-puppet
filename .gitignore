@@ -8,9 +8,11 @@ dev
 
 # this is where our puppet node manifests live, and will define how puppet will
 # configure our boxes
-puppet/nodes
+puppet/manifests/nodes/
 
 # this should be pointing to our production puppet modules
 puppet/modules
 
 .vagrant
+
+sync/*

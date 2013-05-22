@@ -10,13 +10,13 @@ node 'pm.lan' {
 
     file { '/etc/puppet/manifests':
       ensure => link,
-      target => '/bs/manifests',
+      target => '/tmp/vagrant-puppet/manifests',
       force  => true,
     }
     file { '/etc/puppet/autosign.conf':
       ensure  => file,
       mode    => '0444',
-      content => "*.lan",
+      content => '*.lan',
     }
     exec { 'disable-selinux':
       command => '/usr/sbin/setenforce 0 && touch /tmp/selinux_permissive',
