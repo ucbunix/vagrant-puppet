@@ -8,5 +8,5 @@
 # This file should be named config.d/VagrantInit to work
 
 Vagrant.configure("2") do |config|
-  #config.vm.provision :shell, :inline => "echo 10.0.0.10  burn burn.lan >> /etc/hosts"
+  #config.vm.provision :shell, :inline => "echo 10.0.0.11  burn burn.lan >> /etc/hosts"
 end
