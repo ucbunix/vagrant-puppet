@@ -1,16 +1,24 @@
 # this is our custom configurations
 config.d/*
+!config.d/*.example
 
 # this is where we'll do our work on modules, it will be ahead of the other
 # modules directories in the modulepath, so it'll take precedence in cases of
 # conflict between same-name modules.
-dev
+dev/*
 
 # this is where our puppet node manifests live, and will define how puppet will
 # configure our boxes
-puppet/manifests/nodes/
+puppet/manifests/nodes/*.pp
 
-# this should be pointing to our production puppet modules
+
+# any directory with .emptydir, even if empty or all other files excluded
+# will be put in source control.  this is so people can clone this repo
+# with the necessary directories all setup
+!*/.emptydir
+
+# this is likely a symlink pointing to our production modules, so lets ignore it
+# should be pointing to our production puppet modules
 puppet/modules
 
 .vagrant

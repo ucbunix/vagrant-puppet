@@ -15,7 +15,7 @@ end
 
 # In this file, we should put any additional config options that should apply
 # to all hosts, such as entries into /etc/hosts, and the default box
-load "#{home}/config.d/VagrantInit"
+load "#{home}/config.d/vagrant-init"
 
 Vagrant.configure("2") do |config|
   # Puppet Master
@@ -33,4 +33,4 @@ Vagrant.configure("2") do |config|
   end
 end
 
-load "#{home}/config.d/Vagrantfile"
+load "#{home}/config.d/vagrant-config"

@@ -1,0 +1,8 @@
+vagrant/puppet/README
+
+This directory represents a puppet environment, complete with a manifests and
+module directory.
+
+A manifest directory should be pre-built for you, but the modules directory
+should be a symlink to your production modules that you wish to test against
+but not alter.
