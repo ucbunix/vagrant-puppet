@@ -1,0 +1,11 @@
+## Node: default
+##
+## This node is a pseudo node, and defines default values for all other
+## generated nodes.  Nodes can choose to override some or all of the defaults
+## set here.
+---
+vm:
+  box: el6
+  provision:
+  - shell:
+      inline: "echo 10.0.0.10 puppet puppet.lan >> /etc/hosts"

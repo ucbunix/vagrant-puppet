@@ -1,0 +1,9 @@
+[submodule "util/modules/git"]
+	path = util/modules/git
+	url = https://github.com/arusso/puppet-git
+[submodule "util/modules/iptables"]
+	path = util/modules/iptables
+	url = https://github.com/arusso/puppet-iptables
+[submodule "util/modules/puppet"]
+	path = util/modules/puppet
+	url = https://github.com/arusso/puppet-puppet
