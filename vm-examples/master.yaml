@@ -1,0 +1,23 @@
+## Node: master
+##
+## Puppetmaster node.  This will bootstrap a puppetmaster, enable autosigning
+## for all nodes on the *.lan domain, open the firewall for port 8140 and
+## disable selinux.
+---
+vm:
+  hostname: puppet.lan
+  provision:
+  - puppet:                    # config.vm.provision :puppet do |puppet|
+      manifests_path: 'util/manifests/'   #   puppet.manifests_path = "blah"
+      module_path: 'util/modules/'      #   puppet.module_path = "blah"
+      manifest_file: 'master.pp'  
+  network:                       # config.vm.network
+  - forwarded_port:            # config.vm.network :forwarded_port do |fwd|
+      :guest: 8140                #   fwd.guest = 80
+      :host: 8140               #   fwd.host = 8080
+  - forwarded_port:
+      :guest: 80
+      :host:  8080
+  - forwarded_port:
+      :guest: 443
+      :host: 8443

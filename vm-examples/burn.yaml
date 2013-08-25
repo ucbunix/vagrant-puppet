@@ -1,0 +1,9 @@
+## Node: burn
+##
+## A simple burn box using the default box.  You may override the box by
+## uncommenting the appropriate line below, and replacing it with a box of your
+## choosing.
+---
+vm:
+  hostname: burn.lan
+#  box: el6
