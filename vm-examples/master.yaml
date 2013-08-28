@@ -23,3 +23,10 @@ vm:
   - forwarded_port:
       :guest: 443
       :host: 8443
+  synced_folder:
+  -
+    - puppet/manifests
+    - /tmp/master/manifests
+  -
+    - puppet/modules
+    - /tmp/master/modules

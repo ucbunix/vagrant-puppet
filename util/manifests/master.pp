@@ -37,10 +37,6 @@ case $::osfamily {
       require => Package['yum-plugin-versionlock'],
       before  => Class['puppet'],
     }
-    #    package { 'puppet-server':
-    #  ensure => installed,
-    #  before => [ File[$manifests_dir], File[$autosign_file] ]
-    #}
     $manifests_dir = '/etc/puppet/manifests'
     $modules_dir = '/etc/puppet/modules'
     $autosign_file = '/etc/puppet/autosign.conf'
@@ -52,12 +48,16 @@ case $::osfamily {
 }
 
 # setup our symlinks
-file { $manifests_dir:
+file { $modules_dir:
   ensure => link,
-  target => '/tmp/vagrant-puppet/manifests',
+  target => '/tmp/master/modules',
   force  => true,
 }
-
+file { $manifests_dir:
+  ensure => link,
+  target => '/tmp/master/manifests',
+  force  => true,
+}
 file { $autosign_file:
   ensure  => file,
   mode    => '0444',
@@ -88,44 +88,44 @@ iptables::rule { 'allow-rel-est-traffic':
   comment            => 'allow related/established traffic',
   chain              => 'INPUT',
   state              => 'RELATED,ESTABLISHED',
-  priority           => '100',
+  order              => '100',
 }
 iptables::rule { 'allow-ssh-all':
   comment          => 'allow ssh from world',
   destination_port => [ '22' ],
   protocol         => 'tcp',
-  priority         => '110',
+  order            => '110',
 }
 iptables::rule { 'allow-icmp-all':
   comment  => 'allow icmp from world',
   protocol => 'icmp',
   action   => 'ACCEPT',
-  priority => '101',
+  order    => '101',
 }
 iptables::rule { 'allow-puppetmaster':
   comment            => 'allow puppet agents to connect',
   action             => 'ACCEPT',
   destination_port   => '8140',
   protocol           => 'tcp',
-  priority           => '100',
+  order              => '100',
 }
 iptables::rule { 'allow-loopback':
   comment            => 'allow loopback',
   incoming_interface => 'lo',
   action             => 'ACCEPT',
-  priority           => '100',
+  order              => '100',
 }
 iptables::rule { 'input-deny-all':
   comment     => 'global deny',
   chain       => 'INPUT',
-  priority    => '999',
+  order       => '999',
   action      => 'REJECT',
   reject_with => 'icmp-host-prohibited',
 }
 iptables::rule { 'forward-deny-all':
   comment     => 'global deny',
   chain       => 'FORWARD',
-  priority    => '999',
+  order       => '999',
   action      => 'REJECT',
   reject_with => 'icmp-host-prohibited',
 }
