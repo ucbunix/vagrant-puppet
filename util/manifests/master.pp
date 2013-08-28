@@ -1,5 +1,4 @@
 include git
-include eu::repo::epel
 
 # We're running in vagrant, which means we do some weirdness
 $modulepath = [ '/tmp/vagrant-puppet/modules-0',
@@ -14,33 +13,34 @@ $version = '2.7.22'
 case $::osfamily {
   'RedHat': {
     $repo = $::operatingsystemrelease ? {
-      /^5/ => "http://yum.puppetlabs.com/el/5/products/${architecture}/",
-      /^6/ => "http://yum.puppetlabs.com/el/6/products/${architecture}/",
+      /^5/ => "http://yum.puppetlabs.com/el/5/products/${::architecture}/",
+      /^6/ => "http://yum.puppetlabs.com/el/6/products/${::architecture}/",
     }
     yumrepo { 'puppetlabs':
       baseurl      => $repo,
-      enabled      => true,
-      gpgcheck     => false,
+      enabled      => '1',
+      gpgcheck     => '0',
       gpgkey       => 'absent',
       http_caching => 'packages',
+      before       => Package['yum-plugin-versionlock'],
     }
-    package { 'yum-plugins-versionlock': ensure => installed }
+    package { 'yum-plugin-versionlock': ensure => installed }
 
     exec { "yum versionlock puppet-${version}-*; touch /tmp/vl-puppet":
       path    => '/bin:/sbin:/usr/bin:/usr/sbin',
       creates => '/tmp/vl-puppet',
-      require => Package['yum-plugins-versionlock'],
+      require => Package['yum-plugin-versionlock'],
     }
     exec { "yum versionlock puppet-server-${version}-*; touch /tmp/vl-puppetd":
       path    => '/bin:/sbin:/usr/bin:/usr/sbin',
       creates => '/tmp/vl-puppetd',
-      require => Package['yum-plugins-versionlock'],
-      before  => Package['puppet-server'],
+      require => Package['yum-plugin-versionlock'],
+      before  => Class['puppet'],
     }
-    package { 'puppet-server':
-      ensure => installed,
-      before => [ File[$manifests_dir], File[$autosign_file] ]
-    }
+    #    package { 'puppet-server':
+    #  ensure => installed,
+    #  before => [ File[$manifests_dir], File[$autosign_file] ]
+    #}
     $manifests_dir = '/etc/puppet/manifests'
     $modules_dir = '/etc/puppet/modules'
     $autosign_file = '/etc/puppet/autosign.conf'
@@ -82,7 +82,6 @@ class { 'puppet':
   modulepath    => join($modulepath,':'),
   manifest      => '/etc/puppet/manifests/site.pp',
   dns_alt_names => [ 'pm.lan', 'pm', 'puppet.lan', 'puppet' ],
-  require       => Class['eu::repo::epel'],
 }
 
 iptables::rule { 'allow-rel-est-traffic':
@@ -100,12 +99,12 @@ iptables::rule { 'allow-ssh-all':
 iptables::rule { 'allow-icmp-all':
   comment  => 'allow icmp from world',
   protocol => 'icmp',
-  action   => 'accept',
+  action   => 'ACCEPT',
   priority => '101',
 }
 iptables::rule { 'allow-puppetmaster':
   comment            => 'allow puppet agents to connect',
-  action             => 'accept',
+  action             => 'ACCEPT',
   destination_port   => '8140',
   protocol           => 'tcp',
   priority           => '100',
@@ -113,7 +112,7 @@ iptables::rule { 'allow-puppetmaster':
 iptables::rule { 'allow-loopback':
   comment            => 'allow loopback',
   incoming_interface => 'lo',
-  action             => 'accept',
+  action             => 'ACCEPT',
   priority           => '100',
 }
 iptables::rule { 'input-deny-all':
