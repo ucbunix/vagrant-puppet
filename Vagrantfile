@@ -64,7 +64,18 @@ Vagrant.configure('2') do |vc|
 
   def apply_hash( vm_obj, hash )
     hash.each do |k,v|
-      vm_obj.call("#{k}".to_sym, v)
+      begin
+        vm_obj.call("#{k}".to_sym, v)
+      rescue ArgumentError
+        # in some cases, we cant just pass an object to the function and expect
+        # it to know what to do with it.  in this case, we need to create the
+        # block and add the assign the appropriate settings
+        vm_obj.call("#{k}") do |blk|
+          v.each do |k0,v0|
+            blk.send("#{k0}=".to_sym, v0)
+          end
+        end
+      end
     end
   end
 
@@ -80,6 +91,9 @@ Vagrant.configure('2') do |vc|
     next if name == 'default'
     vc.vm.define name.to_s do |vm_cfg|
        vm_cfg.vm.hostname = name
+       vm_cfg.vm.provider :virtualbox do |vb|
+         vb.name = name
+       end
        apply_config(vm_cfg, cfg)
     end
   end
