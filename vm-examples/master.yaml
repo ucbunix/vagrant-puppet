@@ -12,6 +12,8 @@ vm:
       module_path: 'util/modules/'      #   puppet.module_path = "blah"
       manifest_file: 'master.pp'  
   network:                       # config.vm.network
+  - private_network:
+      :ip: 10.0.0.10
   - forwarded_port:            # config.vm.network :forwarded_port do |fwd|
       :guest: 8140                #   fwd.guest = 80
       :host: 8140               #   fwd.host = 8080
