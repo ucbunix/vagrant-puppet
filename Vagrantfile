@@ -6,8 +6,11 @@ require 'yaml'
 home = File.dirname(__FILE__)
 
 # load our configs
-app = YAML::load_file("#{home}/config.yaml")
-app = { } if app == nil
+begin
+  app = YAML::load_file("#{home}/config.yaml")
+rescue
+  app = { }
+end
 vm_dir = app['vm_dir'].is_a?(String) ? config['vm_dir'] : "#{home}/vms.d"
 vm_configs = Dir.glob("#{vm_dir}/*.yaml") if File.directory?("#{vm_dir}")
 
