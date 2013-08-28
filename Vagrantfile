@@ -54,6 +54,9 @@ Vagrant.configure('2') do |vc|
         value.each do |value0|
           if value0.is_a?(Hash)
             apply_hash(vm_obj.method(setting.to_s), value0)
+          elsif value0.is_a?(Array)
+            mth = vm_obj.method(setting.to_s)
+            mth.call(*value0)
           else
             apply_setting(vm_obj.method(setting.to_s), value, value0)
           end
@@ -80,7 +83,11 @@ Vagrant.configure('2') do |vc|
   end
 
   def apply_setting( vm_obj, setting, value )
-    vm_obj.send("#{setting}=".to_sym, value )
+    #begin
+      vm_obj.send("#{setting}=".to_sym, value )
+    #rescue NoMethodError
+    #  vm_obj.call(setting[0],setting[1])    
+    #end
   end
 
   # define the default vm
