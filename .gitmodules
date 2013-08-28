@@ -7,3 +7,15 @@
 [submodule "util/modules/puppet"]
 	path = util/modules/puppet
 	url = https://github.com/arusso/puppet-puppet
+[submodule "util/modules/stdlib"]
+	path = util/modules/stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib
+[submodule "util/modules/inifile"]
+	path = util/modules/inifile
+	url = https://github.com/puppetlabs/puppetlabs-inifile
+[submodule "util/modules/oski"]
+	path = util/modules/oski
+	url = https://github.com/arusso/puppet-oski
+[submodule "util/modules/concat"]
+	path = util/modules/concat
+	url = https://github.com/ripienaar/puppet-concat
