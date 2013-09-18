@@ -7,7 +7,8 @@ EOF
 
 echo "Generating necessary directories"
 mkdir -p logs
-mkdir -p puppet/{manifests,modules} 2>logs/setup-errors.log >dev/null
+mkdir -p puppet/manifests 2>logs/setup-errors.log >/dev/null
+mkdir -p puppet/modules 2>logs/setup-errors.log >/dev/null
 
 echo "Creating symlinks to save time"
 [[ ! -x dev ]] && ln -s puppet/modules/ dev 2>/dev/null
