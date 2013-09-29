@@ -1,8 +1,6 @@
 include git
 
-# We're running in vagrant, which means we do some weirdness
-$modulepath = [ '/tmp/vagrant-puppet/modules-0',
-                '/tmp/vagrant-puppet/modules-1' ]
+$modulepath = [ '/etc/puppet/modules' ]
 
 # define what version of puppet we want to install here
 $version = '2.7.22'
