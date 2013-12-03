@@ -21,6 +21,7 @@ end
 
 # define our vms
 Vagrant.configure('2') do |vc|
+
   # given a vm obj and the root of the config, we'll build our vm
   def apply_config( vm_obj, cfg )
     # Vagrant uses the config_map to dynamically insantiate configuration
@@ -62,7 +63,7 @@ Vagrant.configure('2') do |vc|
           end
         end
       end
-    end 
+    end
   end
 
   def apply_hash( vm_obj, hash )
@@ -73,9 +74,21 @@ Vagrant.configure('2') do |vc|
         # in some cases, we cant just pass an object to the function and expect
         # it to know what to do with it.  in this case, we need to create the
         # block and add the assign the appropriate settings
-        vm_obj.call("#{k}") do |blk|
-          v.each do |k0,v0|
-            blk.send("#{k0}=".to_sym, v0)
+        if k == "vmware_fusion"
+          vm_obj.call("#{k}") do |blk|
+            v.each do |k0,v0|
+              # k0 would be vmx
+              v0.each do |k1,v1|
+                # k1 would be memsize, v1 would be 1024
+                blk.send("#{k0}")[k1] = v1
+              end
+            end
+          end
+        else
+          vm_obj.call("#{k}") do |blk|
+            v.each do |k0,v0|
+              blk.send("#{k0}=".to_sym, v0)
+            end
           end
         end
       end
@@ -92,16 +105,19 @@ Vagrant.configure('2') do |vc|
 
   # define the default vm
   apply_config(vc, vms['default']) if vms['default'] != nil
-  
+
   # setup the other vms
   vms.each do |name,cfg|
     next if name == 'default'
     vc.vm.define name.to_s do |vm_cfg|
-       vm_cfg.vm.hostname = name
-       vm_cfg.vm.provider :virtualbox do |vb|
-         vb.name = name
-       end
-       apply_config(vm_cfg, cfg)
+      vm_cfg.vm.hostname = name
+      vm_cfg.vm.provider "virtualbox" do |vb|
+        vb.name = name
+      end
+      vm_cfg.vm.provider "vmware_fusion" do |vf|
+        vf.name = name
+      end
+      apply_config(vm_cfg, cfg)
     end
   end
 end
