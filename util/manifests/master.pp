@@ -1,6 +1,6 @@
 include git
 
-$modulepath = [ '/etc/puppet/modules' ]
+$modulepath = [ '/tmp/master/modules' ]
 
 # define what version of puppet we want to install here
 $version = '2.7.22'
@@ -35,8 +35,8 @@ case $::osfamily {
       require => Package['yum-plugin-versionlock'],
       before  => Class['puppet'],
     }
-    $manifests_dir = '/etc/puppet/manifests'
-    $modules_dir = '/etc/puppet/modules'
+    $manifests_dir = '/tmp/master/manifests'
+    $modules_dir = '/tmp/master/modules'
     $autosign_file = '/etc/puppet/autosign.conf'
   }
 
@@ -53,16 +53,16 @@ file { '/etc/puppet/site.pp':
   group   => 'root',
   mode    => '0444',
 }
-file { $modules_dir:
-  ensure => link,
-  target => '/tmp/master/modules',
-  force  => true,
-}
-file { $manifests_dir:
-  ensure => link,
-  target => '/tmp/master/manifests',
-  force  => true,
-}
+#file { $modules_dir:
+#  ensure => link,
+#  target => '/tmp/master/modules',
+#  force  => true,
+#}
+#file { $manifests_dir:
+#  ensure => link,
+#  target => '/tmp/master/manifests',
+#  force  => true,
+#}
 file { $autosign_file:
   ensure  => file,
   mode    => '0444',
