@@ -3,7 +3,7 @@ include git
 $modulepath = [ '/tmp/master/modules' ]
 
 # define what version of puppet we want to install here
-$version = '2.7.22'
+$version = '2.7.*'
 
 # add our puppetlabs repo, install the current version of puppet.  currently,
 # this is geared towards redhat systems, but i would *love* for someone to make
@@ -53,16 +53,16 @@ file { '/etc/puppet/site.pp':
   group   => 'root',
   mode    => '0444',
 }
-#file { $modules_dir:
-#  ensure => link,
-#  target => '/tmp/master/modules',
-#  force  => true,
-#}
-#file { $manifests_dir:
-#  ensure => link,
-#  target => '/tmp/master/manifests',
-#  force  => true,
-#}
+file { '/etc/puppet/modules':
+  ensure => link,
+  target => $modules_dir,
+  force  => true,
+}
+file { '/etc/puppet/manifests':
+  ensure => link,
+  target => $manifests_dir,
+  force  => true,
+}
 file { $autosign_file:
   ensure  => file,
   mode    => '0444',

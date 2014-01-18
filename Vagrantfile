@@ -4,120 +4,86 @@
 require 'yaml'
 
 home = File.dirname(__FILE__)
+vm_dir = "#{home}/vms.d"
 
-# load our configs
-begin
-  app = YAML::load_file("#{home}/config.yaml")
-rescue
-  app = { }
-end
-vm_dir = app['vm_dir'].is_a?(String) ? config['vm_dir'] : "#{home}/vms.d"
-vm_configs = Dir.glob("#{vm_dir}/*.yaml") if File.directory?("#{vm_dir}")
-
-vms = { }
-vm_configs.each do |vconf|
-  vms[File.basename(vconf).sub('.yaml','')] = YAML::load_file(vconf)
+# load our configs once
+config_files = Dir.glob("#{vm_dir}/*.yaml") if File.directory?("#{vm_dir}")
+$vms = { }
+config_files.each do |conf|
+  $vms[File.basename(conf).sub('.yaml','')] = YAML::load_file(conf)
 end
 
-# define our vms
-Vagrant.configure('2') do |vc|
 
-  # given a vm obj and the root of the config, we'll build our vm
-  def apply_config( vm_obj, cfg )
-    # Vagrant uses the config_map to dynamically insantiate configuration
-    # classes.  The primary mechanism for this is catching the method_missing
-    # function, which insantiates our class for us and returns the resulting
-    # object.
-    config_map = vm_obj.instance_variable_get(:@config_map)
-    cfg.each do |namespace,namespace_config|
-      if config_map.to_hash.has_key?(namespace.to_sym)
-        vm_ns_obj = vm_obj.method_missing(namespace.to_sym)
-        apply_settings(vm_ns_obj, namespace_config )
-      else
-        # skip unhandled namespaces
-        # TODO: work in support for creating templates 
-        next
-      end
-    end
+# apply our vm configuration
+#
+# == Paramters:
+#
+# [*vagrant*]
+#   The vagrant configuration object
+#
+# [*name*]
+#   The name of the host configuration to apply
+#
+# [*apply_to*]
+#   The virtual machine to apply the named host configuration to. If not set,
+#   defaults to the named configuration.
+#
+def configure_vm(vagrant,name,apply_to=nil)
+  puts "virtual machine: #{name}" unless apply_to
+  apply_to ||= name
+
+  # config to apply
+  vmcfg=$vms[name]
+
+  # apply our default config first
+  configure_vm(vagrant,'default',apply_to) if apply_to == name
+
+  # apply our templates
+  vmcfg['templates'] ||= [ ]
+  vmcfg['templates'].each do |tmpl|
+    configure_vm(vagrant,tmpl,apply_to)
   end
 
-  # apply settings for a particular namespace.  All we need to do is provide
-  # the appropriate object for that particular namespace and the rest of the
-  # configuration object, peeling off the other namespace settings.
-  def apply_settings( vm_obj, cfg )
-    cfg.each do |setting,value|
-      case value
-      when String,Fixnum
-        apply_setting(vm_obj, setting, value)
-      when Hash
-        apply_hash(vm_obj, value)
-      when Array
-        value.each do |value0|
-          if value0.is_a?(Hash)
-            apply_hash(vm_obj.method(setting.to_s), value0)
-          elsif value0.is_a?(Array)
-            mth = vm_obj.method(setting.to_s)
-            mth.call(*value0)
-          else
-            apply_setting(vm_obj.method(setting.to_s), value, value0)
-          end
+  puts "  applying template: #{name}" unless apply_to == name
+  puts "  applying host config: #{name}" if apply_to == name
+  # apply remaining config
+  vagrant.vm.define apply_to do |host|
+    # configure our node
+    host.vm.box = vmcfg['vm']['box'] if vmcfg['vm']['box']
+    host.vm.hostname = vmcfg['vm']['hostname'] if vmcfg['vm']['hostname']
+
+    # configure our provisioner and networking
+    [ 'provision', 'network' ].each do |setting|
+      vmcfg['vm'][setting] ||= [ ]
+      vmcfg['vm'][setting].each do |data|
+        data.each do |type,opts|
+          host.vm.send(setting,type.to_sym, opts)
         end
       end
     end
-  end
 
-  def apply_hash( vm_obj, hash )
-    hash.each do |k,v|
-      begin
-        vm_obj.call("#{k}".to_sym, v)
-      rescue ArgumentError
-        # in some cases, we cant just pass an object to the function and expect
-        # it to know what to do with it.  in this case, we need to create the
-        # block and add the assign the appropriate settings
-        if k == "vmware_fusion"
-          vm_obj.call("#{k}") do |blk|
-            v.each do |k0,v0|
-              # k0 would be vmx
-              v0.each do |k1,v1|
-                # k1 would be memsize, v1 would be 1024
-                blk.send("#{k0}")[k1] = v1
-              end
-            end
-          end
-        else
-          vm_obj.call("#{k}") do |blk|
-            v.each do |k0,v0|
-              blk.send("#{k0}=".to_sym, v0)
-            end
-          end
-        end
-      end
-    end
-  end
-
-  def apply_setting( vm_obj, setting, value )
-    #begin
-      vm_obj.send("#{setting}=".to_sym, value )
-    #rescue NoMethodError
-    #  vm_obj.call(setting[0],setting[1])    
-    #end
-  end
-
-  # define the default vm
-  apply_config(vc, vms['default']) if vms['default'] != nil
-
-  # setup the other vms
-  vms.each do |name,cfg|
-    next if name == 'default'
-    vc.vm.define name.to_s do |vm_cfg|
-      vm_cfg.vm.hostname = name
-      vm_cfg.vm.provider "virtualbox" do |vb|
-        vb.name = name
-      end
-      vm_cfg.vm.provider "vmware_fusion" do |vf|
-        vf.name = name
-      end
-      apply_config(vm_cfg, cfg)
+    # setup synced folder
+    vmcfg['vm']['synced_folder'] ||= [ ]
+    vmcfg['vm']['synced_folder'].each do |folders|
+      host.vm.synced_folder *folders
     end
   end
 end
+
+def run_app()
+  Vagrant.configure("2") do |vagrant|
+    printf("\n"+"#"*80+"\n%s\n", "YAML Config Generator".center(80))
+    printf("#"*80+"\n\n")
+    $vms.each do |vm,cfg|
+      # skip the default config
+      next if vm == 'default'
+      # apply our config if it's not a template
+      configure_vm(vagrant,vm) unless cfg['template']
+    end
+    printf("\n"+"#"*80+"\n%s\n", "YAML Config Generator Complete!".center(80))
+    printf("#"*80+"\n\n")
+  end
+end
+
+# run our app
+run_app
