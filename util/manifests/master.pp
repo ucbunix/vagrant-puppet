@@ -46,22 +46,12 @@ case $::osfamily {
 }
 
 # setup our symlinks
-file { '/etc/puppet/site.pp':
+file { '/tmp/master/site.pp':
   ensure  => present,
   content => "import 'manifests/*.pp'\n",
   owner   => 'root',
   group   => 'root',
   mode    => '0444',
-}
-file { '/etc/puppet/modules':
-  ensure => link,
-  target => $modules_dir,
-  force  => true,
-}
-file { '/etc/puppet/manifests':
-  ensure => link,
-  target => $manifests_dir,
-  force  => true,
 }
 file { $autosign_file:
   ensure  => file,
@@ -85,7 +75,7 @@ exec { 'restart-firewall':
 class { 'puppet':
   master        => true,
   modulepath    => join($modulepath,':'),
-  manifest      => '/etc/puppet/site.pp',
+  manifest      => '/tmp/master/site.pp',
   dns_alt_names => [ 'pm.lan', 'pm', 'puppet.lan', 'puppet' ],
 }
 
