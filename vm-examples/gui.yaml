@@ -5,16 +5,12 @@
 ## settings below show how to disable the headless mode.
 ---
 vm:
+  gui: true
   hostname: gui.lan
   box: el6
-  provider:
-    - virtualbox:
-       gui: true
-       name: gui
   provision:
     - puppet_server:
         puppet_server: 'puppet.lan'
-        puppet_node: 'gui.lan'
         options: '--no-daemonize --pluginsync -t'
   network:
     - private_network:

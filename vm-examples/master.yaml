@@ -5,6 +5,8 @@
 ## disable selinux.
 ---
 vm:
+  memory: 512
+  cpu: 2
   hostname: puppet.lan
   provision:
   - puppet:                    # config.vm.provision :puppet do |puppet|
