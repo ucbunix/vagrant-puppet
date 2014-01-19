@@ -1,0 +1,7 @@
+---
+template: true
+vm:
+  box: centos6-min
+  provision:
+    - shell:
+        inline: 'echo "Imma template!"'

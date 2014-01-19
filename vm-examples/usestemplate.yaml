@@ -1,0 +1,5 @@
+---
+templates:
+- template
+vm:
+  hostname: usestemplate.lan
