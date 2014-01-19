@@ -50,7 +50,10 @@ def configure_vm(vagrant,name,apply_to=nil)
   vagrant.vm.define apply_to do |host|
     # configure our node
     host.vm.box = vmcfg['vm']['box'] if vmcfg['vm']['box']
-    host.vm.hostname = vmcfg['vm']['hostname'] if vmcfg['vm']['hostname']
+    host.vm.hostname = vmcfg['vm']['hostname'] if vmcfg['vm']['hostname'] and apply_to == name
+    # vagrant is setting the hostname properly. here's a hacky workaround
+    host.vm.provision "shell", inline: "hostname #{vmcfg['vm']['hostname']}" \
+      if vmcfg['vm']['hostname'] and apply_to == name
 
     configure_providers(host,vmcfg)
 
