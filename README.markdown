@@ -55,16 +55,16 @@ Example
           module_path: 'util/modules/'
       network:
       - private_network:
-        ip: 10.0.0.0
+        :ip: 10.0.0.0
       - forwarded_port:
-        guest: 8140
-        host: 8140
+        :guest: 8140
+        :host: 8140
       - forwarded_port:
-        guest: 80
-        host: 8080
+        :guest: 80
+        :host: 8080
       - forwarded_port:
-        guest: 443
-        host: 8443
+        :guest: 443
+        :host: 8443
       synced_folder:
       -
         - puppet/manifests
