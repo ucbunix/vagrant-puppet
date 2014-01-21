@@ -34,7 +34,7 @@ Example
     vm:
       provision:
       - shell:
-        inline: "echo 10.0.0.0 puppet puppet.lan >> /etc/hosts"
+        inline: "echo 10.0.0.10 puppet puppet.lan >> /etc/hosts"
 
     # $basedir/vms.d/master.yaml
     ---
@@ -55,7 +55,7 @@ Example
           module_path: 'util/modules/'
       network:
       - private_network:
-        :ip: 10.0.0.0
+        :ip: 10.0.0.10
       - forwarded_port:
         :guest: 8140
         :host: 8140
