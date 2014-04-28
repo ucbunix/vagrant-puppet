@@ -8,3 +8,4 @@ vms.d/
 *.swp
 .DS_STORE
 *.old
+util/xfer/*
