@@ -4,10 +4,28 @@
 require 'yaml'
 
 home = File.dirname(__FILE__)
-vm_dir = "#{home}/vms.d"
+$defaults = {
+  :debug => 1,
+  :vm_dir => "#{home}/vms.d",
+}
+
+$cfg = { }
+begin
+  $cfg = YAML::load_file( "#{home}/.vagrant.yaml" )
+  $cfg = $defaults.merge($cfg)
+rescue
+  $cfg = $defaults
+end
+
+
+def debug(msg, level = 2, indent = 0)
+  if $cfg[:debug] >= level
+    printf "%#{indent}s%s\n" % [ "",  msg ]
+  end
+end
 
 # load our vm configs once
-config_files = Dir.glob("#{vm_dir}/*.yaml") if File.directory?("#{vm_dir}")
+config_files = Dir.glob("#{$cfg[:vm_dir]}/*.yaml") if File.directory?("#{$cfg[:vm_dir]}")
 $vms = { }
 config_files.each do |conf|
   $vms[File.basename(conf).sub('.yaml','')] = YAML::load_file(conf)
@@ -29,7 +47,7 @@ end
 #   defaults to the named configuration.
 #
 def configure_vm(vagrant,name,apply_to=nil)
-  puts "virtual machine: #{name}" unless apply_to
+  debug("virtual machine: #{name}") unless apply_to
   apply_to ||= name
 
   # config to apply
@@ -44,8 +62,8 @@ def configure_vm(vagrant,name,apply_to=nil)
     configure_vm(vagrant,tmpl,apply_to)
   end
 
-  puts "  applying template: #{name}" unless apply_to == name
-  puts "  applying host config: #{name}" if apply_to == name
+  debug("applying template: #{name}",2,2) unless apply_to == name
+  debug("applying host config: #{name}",2,2) if apply_to == name
   # apply remaining config
   vagrant.vm.define apply_to do |host|
     # configure our node
@@ -95,7 +113,7 @@ def configure_providers(host,vmcfg)
     end
     begin
       send("configure_#{p}",host,vmcfg)
-    rescue NoMethodError => e
+    rescue NoMethodError
       # do nothing
     end
   end
@@ -137,16 +155,16 @@ end
 
 def run_app()
   Vagrant.configure("2") do |vagrant|
-    printf("\n"+"#"*80+"\n%s\n", "YAML Config Generator".center(80))
-    printf("#"*80+"\n\n")
+    debug("\n"+"#"*80+"\n"+"YAML Config Generator".center(80),2)
+    debug("#"*80,2)
     $vms.each do |vm,cfg|
       # skip the default config
       next if vm == 'default'
       # apply our config if it's not a template
       configure_vm(vagrant,vm) unless cfg['template']
     end
-    printf("\n"+"#"*80+"\n%s\n", "YAML Config Generator Complete!".center(80))
-    printf("#"*80+"\n\n")
+    debug("\n"+"#"*80+"\n"+"YAML Config Generator Complete!".center(80),2)
+    debug("#"*80+"\n",2)
   end
 end
 
