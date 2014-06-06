@@ -75,12 +75,12 @@ def configure_vm(vagrant,name,apply_to=nil)
 
     configure_providers(host,vmcfg)
 
-    # configure our provisioner and networking
     [ 'provision', 'network' ].each do |setting|
       vmcfg['vm'][setting] ||= [ ]
       vmcfg['vm'][setting].each do |data|
         data.each do |type,opts|
-          host.vm.send(setting,type.to_sym, opts)
+          opts=Hash[opts.map{ |k,v| [k.to_sym,v] }]
+          host.vm.send( setting, type.to_sym, {**opts} )
         end
       end
     end
