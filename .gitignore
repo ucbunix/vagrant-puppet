@@ -9,3 +9,4 @@ vms.d/
 .DS_STORE
 *.old
 util/xfer/*
+.vagrant.yaml
